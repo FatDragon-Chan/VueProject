@@ -85,7 +85,19 @@ export default {
       this.isCollapse = !this.isCollapse
     },
     // 退出
-    logout() {}
+    logout() {
+      this.$confirm('确定退出吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 清除token
+          localStorage.removeItem('mytoken')
+          
+          // 跳转登陆页面
+          this.$router.push('/login')
+        });
+    }
   }
 }
 </script>

@@ -65,7 +65,7 @@
       >
         <template slot-scope="scope">
           <!-- scope.row 就拿到当前遍历的那一行数据 -->
-          <el-switch v-model="scope.row.mg_state">
+          <el-switch @change="changeState(scope.row.mg_state,scope.row.id)" v-model="scope.row.mg_state">
           </el-switch>
         </template>
       </el-table-column>
@@ -75,12 +75,14 @@
             icon="el-icon-edit"
             type="primary"
             size="mini"
+            @click="queryUser(scope.row.id)"
             plain
           ></el-button>
           <el-button
             size="mini"
             icon="el-icon-delete"
             type="danger"
+            @click="deleteUser(scope.row.id)"
             plain
           ></el-button>
           <el-button
@@ -154,6 +156,48 @@
         >确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 5.0 编辑用户的对话框 -->
+    <el-dialog
+      title="新增用户"
+      :visible.sync="dialogVisible4Edit"
+      width="50%"
+    >
+      <el-form
+        :model="editUserObj"
+        :rules="rules"
+        ref="addUserRef"
+        label-width="100px"
+      >
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input disabled v-model="editUserObj.username"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
+          <el-input v-model="editUserObj.email"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="电话"
+          prop="mobile"
+        >
+          <el-input v-model="editUserObj.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="dialogVisible4Edit = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="editUser"
+        >确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -167,10 +211,17 @@ export default {
       userList: [], // 用户列表
       total: 0, // 总条数
       dialogVisible4Add: false, //刚开始是隐藏
+      dialogVisible4Edit:false,// 编辑用户界面刚开始也是隐藏的
       addUserObj: {
         // 添加用户
         username: '',
         password: '',
+        email: '',
+        mobile: ''
+      },
+      editUserObj:{
+         // 编辑用户
+        username: '',
         email: '',
         mobile: ''
       },
@@ -229,6 +280,7 @@ export default {
 
       this.getUserListData()
     },
+    // 新增用户
     addUser() {
       // 拿到el-form这个表单
       this.$refs.addUserRef.validate(valid => {
@@ -262,6 +314,66 @@ export default {
             })
         }
       })
+    },
+    // 编译用户状态是否被禁用
+    changeState(state,uid){
+      this.$axios.put(`users/${uid}/state/${state}`).then(response=>{
+        if(response.data.meta.status == 200){
+          // 修改成功 提醒并刷新页面
+          this.$message({
+            message: response.data.meta.msg,
+            type: 'success'
+          });
+        }
+      })
+    },
+    // 查询用户信息
+    queryUser(uid){
+      this.$axios.get(`users/${uid}`).then(response=>{
+        if(response.status==200){
+          this.editUserObj = response.data.data  
+          this.dialogVisible4Edit=true
+        }
+      })
+    },
+    // 编辑用户信息
+    editUser(){
+      this.$axios.put(`users/${this.editUserObj.id}`,this.editUserObj).then(response=>{
+        if(response.status==200){
+          this.$message({
+            message: response.data.meta.msg,
+            type: 'success'
+          })
+
+          // 关闭对话框
+          this.dialogVisible4Edit = false
+
+          // 刷新列表
+          this.getUserListData()
+        }
+      })
+      
+    },
+    // 删除单个用户
+    deleteUser(uid){
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$axios.delete(`users/${uid}`).then(response=>{
+            if(response.data.meta.status ===200){
+              this.$message({
+                message:response.data.meta.msg,
+                type: 'success'
+              });
+
+              this.getUserListData()
+            }
+          })
+        }).catch(()=>{
+          // 取消了
+        });
     }
   }
 }
