@@ -1,11 +1,12 @@
 <template>
   <div>
     <!-- 1.0 面包屑 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
+    <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/layout' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    </el-breadcrumb> -->
+    <my-breadcrumb level1="用户管理" level2="用户列表"></my-breadcrumb>
     <!-- 2.0 搜索框 & 添加用户按钮 -->
     <el-input
       class="search"
@@ -202,7 +203,11 @@
 </template>
 
 <script>
+import myBreadCrumb from '../subComponents/chanBreadcrumb.vue'
 export default {
+  components:{
+    'my-breadcrumb':myBreadCrumb
+  },
   data() {
     return {
       query: '', // 查询关键字
@@ -380,12 +385,7 @@ export default {
 </script>
 
 <style scoped>
-.el-breadcrumb {
-  background-color: #d3dce6;
-  height: 50px;
-  line-height: 50px;
-  padding-left: 10px;
-}
+
 .el-pagination {
   background-color: #d3dce6;
   padding-top: 10px;

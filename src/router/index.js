@@ -12,6 +12,7 @@ import Layout from '../components/layout/Layout'
 import Users from '../components/users/Users'
 import Welcome from '../components/welcome/Welcome'
 import Permissions from '../components/permissions/Permissions'
+import Roles from '../components/roles/Roles'
 
 //创建路由对象，导出去
 const router = new VueRouter({
@@ -20,10 +21,12 @@ const router = new VueRouter({
         {path:'/login',meta:{unRequiresAuth:true},component:Login},
         {path:'/layout',name:'layout',component:Layout,children:[
             {path:'',component:Welcome},
-            // 嵌套路由中的path前面不要加/
+            // 嵌套路由中的path前面不要加/,tips:因为/代表指向根目录
             {path:'users',component:Users},
             // 权限列表
-            {path:'2-2',component:Permissions}
+            {path:'permissions',component:Permissions},
+            // 角色列表
+            {path:'roles',component:Roles}
         ]} // name 相当于这条路由规则的小名
     ]
 })
